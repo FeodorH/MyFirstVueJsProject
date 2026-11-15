@@ -1,50 +1,45 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from "vue";
+import Article from "@/articles/components/ArticleView.vue";
+import { useRouter } from "vue-router";
+import { useArticleStore } from "../stores/articleStore.js";
+
+const router = useRouter();
+
+const store = useArticleStore();
 
 const props = defineProps({
-  article: { type: Object, required: true },
-})
+  id: { type: String, required: true },
+});
 
-const emit = defineEmits(['toggle-published'])
-
-const authorStyle = computed(() => {
-  if (!props.article) return {}
-  return {
-    fontStyle:  props.article.isPublished ? 'normal' : 'italic',
-    fontWeight: props.article.isPublished ? '600'    : '400',
-  }
-}) //TODO: пофиксить работу кнопки по одиночному отображению и заменить элементы на новые
-
+const article = computed(() => store.getArticleById(props.id));
 </script>
 
 <template>
-  <div v-if="props.article">
-    <Card class="mb-3" :class="{ 'unpublished-card': !props.article.isPublished }">
-      <template #title>
-        ID: {{ props.article.id }}
-      </template>
+  <div class="article-page">
+    <Button
+      aria-label="← Назад к списку"
+      severity="secondary"
+      icon="pi pi-arrow-left"
+      @click="router.push('/')"
+    />
 
-      <template #content>
-          <div class="flex flex-col gap-2">
-              <div><strong>Title:</strong> {{ props.article.title }}</div>
-              <div><strong>Author:</strong> <span :style="authorStyle">{{ props.article.author }}</span></div>
-              <div><strong>Body:</strong> {{ props.article.body }}</div>
-          </div>
+    <Article
+      v-if="article"
+      :article="article"
+      @toggle-published="(id) => store.togglePublish(id)"
+    />
 
-          <button class="btn btn-sm btn-outline-secondary" @click="emit('toggle-published', props.article.id)">
-            {{ props.article.isPublished ? 'Снять с публикации' : 'Опубликовать' }}
-          </button>
-      </template>
-    </Card>
-  </div>
-  <div v-else class="alert alert-warning">
-    Загрузка или статья не найдена...
+    <Message v-else severity="warn" :closable="false">
+      Загрузка или статья с ID {{ id }} не найдена...
+    </Message>
   </div>
 </template>
 
 <style scoped>
-.unpublished-card {
-  color: gray !important; 
+.article-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
 }
-
 </style>

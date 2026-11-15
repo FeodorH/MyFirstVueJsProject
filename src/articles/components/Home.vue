@@ -1,42 +1,44 @@
 <script setup>
-import { onMounted } from 'vue'
-import store from '@/articles/store/datastore.js'
-import Article from '../components/Article.vue'
+import ArticleView from "@/articles/components/ArticleView.vue";
+import { useArticleStore } from "../stores/articleStore.js";
+import router from "../router/index.js";
 
 defineProps({
-  msg: { type: String, default: 'Все статьи' },
-})
+  msg: { type: String, default: "Все статьи" },
+});
 
-onMounted(() => {
-  if (store.articles.length === 0 && store.loading === false) {
-    store.getAllArticles()
-  }
-})
+const store = useArticleStore();
+const emits = defineEmits();
 
+await store.loadArticles();
 </script>
 
 <template>
-  <div class="hello container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>{{ msg }}</h1>
-      <RouterLink to="/new" class="btn btn-primary">Добавить статью</RouterLink>
-    </div>
+  <h1>{{ msg }}</h1>
+  <RouterLink to="/new">
+    <Button label="Добавить статью" icon="pi pi-plus" />
+  </RouterLink>
 
-    <p v-if="store.loading">Загрузка статей...</p>
-    <p v-else-if="store.error" class="error">Ошибка: {{ store.error }}</p>
+  <Message v-if="store.wasCancelled" severity="warn" :closable="false">
+    <Label>Загрузка отменена.</Label>
+    <Button label="Загрузить снова" size="small" text @click="emits('retry')" />
+  </Message>
 
-    <div v-else-if="store.articles.length">
-      <Article v-for="article in store.articles"
-        :article="article"
-        @toggle-published="(id) => store.togglePublish(id)"
-      />
-    </div>
-    <p v-else>No articles in the list.</p>
+  <Message v-else-if="store.errorMessage" severity="error" :closable="false">
+    <h4>Не удалось загрузить статьи</h4>
+    <p>
+      Код ошибки: <strong>{{ store.errorStatus ?? "нет соединения" }}</strong>
+    </p>
+    <p>{{ store.errorMessage }}</p>
+    <Button label="Повторить загрузку" size="small" @click="emits('retry')" />
+  </Message>
 
-    
+  <div v-else-if="store.articles.length">
+    <ArticleView
+      v-for="article in store.articles"
+      :key="article.id"
+      :article="article"
+      @toggle-published="(id) => store.togglePublish(id)"
+    />
   </div>
 </template>
-
-<style scoped>
-.error { color: red; }
-</style>

@@ -1,8 +1,8 @@
 <script setup>
 defineProps({
-  variant: { type: String, default: 'primary' },
-  type:    { type: String, default: 'button' },
-})
+  variant: { type: String, default: "primary" },
+  type: { type: String, default: "button" },
+});
 </script>
 
 <template>
