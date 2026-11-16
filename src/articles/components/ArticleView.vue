@@ -17,21 +17,19 @@ const authorStyle = computed(() => {
 </script>
 
 <template>
-  <div v-if="props.article">
-    <Card
-      class="article-card"
-      :class="{ unpublished: !props.article.isPublished }"
-    >
+  <div v-if="props.article" class="mb-3">
+    <Card :class="{ 'opacity-70': !props.article.isPublished }">
       <template #title>
         ID: {{ props.article.id }}
         <Tag
           :value="article.isPublished ? 'Опубликована' : 'Черновик'"
           :severity="article.isPublished ? 'success' : 'warn'"
+          class="ml-2"
         />
       </template>
 
       <template #content>
-        <div class="card-body">
+        <div class="flex flex-column gap-2 px-3">
           <div><strong>Title:</strong> {{ props.article.title }}</div>
           <div>
             <strong>Author:</strong>
@@ -42,7 +40,9 @@ const authorStyle = computed(() => {
 
         <Button
           :severity="article.isPublished ? 'danger' : 'success'"
-          class="toggle-btn"
+          class="mt-3"
+          outlined
+          size="small"
           @click="emit('toggle-published', props.article.id)"
         >
           {{
@@ -56,20 +56,3 @@ const authorStyle = computed(() => {
     Загрузка или статья не найдена...
   </div>
 </template>
-
-<style scoped>
-.article-card {
-  margin-bottom: 1rem;
-}
-.unpublished {
-  opacity: 0.75;
-}
-.card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.toggle-btn {
-  margin-top: 1rem;
-}
-</style>

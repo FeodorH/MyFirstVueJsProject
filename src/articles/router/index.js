@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import ArticleForm from "../components/ArticleForm.vue";
 import Home from "../components/Home.vue";
-import ArticleView from "../components/ArticleView.vue";
+import Article from "../components/Article.vue";
 
 const routes = [
   {
@@ -20,8 +20,8 @@ const routes = [
   },
   {
     path: "/article/:id",
-    name: "articleView",
-    component: ArticleView,
+    name: "article",
+    component: Article,
     props: true,
   },
 ];
